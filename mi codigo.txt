@@ -1,0 +1,71 @@
+package com.example.cacaoapp;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+private Spinner spinner1;
+private EditText casillaComprador, casillaCliente, casillaCantidad, casillaPrecio;
+private TextView resultado;
+public  double cantidadCacaoBruto;
+public  double precioBruto;
+public  double porCentajePrecio= 50;
+public  double porcentajeQuintal= 0.38;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+        casillaComprador=(EditText)findViewById(R.id.txtComprador);
+        casillaCliente=(EditText)findViewById(R.id.txtVendedor);
+        casillaCantidad=(EditText)findViewById(R.id.txtCantidad);
+        casillaPrecio=(EditText)findViewById(R.id.txtPrecio);
+        resultado=(TextView)findViewById(R.id.Resultado);
+        spinner1=(Spinner) findViewById(R.id.SelectorTipo);
+
+        String [] selectorTipo = {"VERDE","SECO"};
+        ArrayAdapter <String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_items_menucacao, selectorTipo);
+        spinner1.setAdapter(adapter);
+    }
+    public void CalculoCacao(){
+        String cantida= casillaCantidad.getText().toString();
+        String precio= casillaPrecio.getText().toString();
+        double cantidadCacao= Double.parseDouble(cantida);
+        double precioCacao= Double.parseDouble(precio);
+        cantidadCacaoBruto= cantidadCacao;
+        precioBruto= precioCacao;
+        cantidadCacao = Math.floor(cantidadCacaoBruto * porcentajeQuintal);
+        precioCacao = precioBruto / porCentajePrecio;
+        double resultadoCacao = cantidadCacao * precioCacao;
+        String resultante = String.valueOf(resultadoCacao);
+        resultado.setText(resultante+"$");
+
+    }
+    public void Calcular(View view){
+        if (casillaComprador.getText().toString().trim().isEmpty() ||
+                casillaCliente.getText().toString().trim().isEmpty() ||
+                casillaCantidad.getText().toString().trim().isEmpty() ||
+                casillaPrecio.getText().toString().trim().isEmpty()){
+            Toast.makeText(getApplicationContext(),"No se puede calcular esta cifra intetalo en otra ocacion",Toast.LENGTH_SHORT).show();
+        } else{
+            CalculoCacao();
+        }
+    }
+}
