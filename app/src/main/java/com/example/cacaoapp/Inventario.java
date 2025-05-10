@@ -29,6 +29,6 @@ public class Inventario extends AppCompatActivity {
         Consultar.obtenerDatos(this, tablas);
         //TODO:Crear un boton para ver total de la fila en un itent llamado Resultados o Estadistica de Inventario
         //TODO:Poner en una casilla la cantidad de cacao vendido, pago y el precio.
-        //TODO: Diseñar de manera apropiada las interfaces Realizar el .
+        //TODO: Diseñar de manera apropiada las interfaces Realizar el.
     }
 }
