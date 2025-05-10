@@ -115,6 +115,7 @@ public class Consultar {
         }
         // Cierra el cursor para liberar recursos
         cursor.close();
+        //TODO:Usar mostrarTotalCantidad para el itent llamado Resultados o Estadistica de Inventario.
     }
 }
 

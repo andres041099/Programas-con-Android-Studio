@@ -82,6 +82,13 @@
             android:text="CALCULAR" />
 
         <Button
+            android:id="@+id/btnBuscar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="buscar"
+            android:text="BUSCAR" />
+
+        <Button
             android:id="@+id/btnMonificar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
