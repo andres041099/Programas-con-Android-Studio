@@ -56,42 +56,66 @@ private  String fechas;
         ArrayAdapter <String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_items_menucacao, selectorTipo);
         Dtipo.setAdapter(adapter);
     }
+    //Metodo para Guardar en la base de Datos
     public void Guardar(View view){
-        AdminSQLiteOpenHelper motorDato = new AdminSQLiteOpenHelper(this, "Motor de Base de Datos", null,1);
-        SQLiteDatabase baseDatos= motorDato.getWritableDatabase();
+        // Creamos una instancia del administrador de la base de datos.
+        AdminSQLiteOpenHelper motorDato = new AdminSQLiteOpenHelper(this, "Motor de Base de Datos", null, 1);
+
+        // Abrimos la base de datos en modo escritura.
+        SQLiteDatabase baseDatos = motorDato.getWritableDatabase();
+
+        // Obtenemos la fecha actual.
         fechas = obtenerFechaActual();
-        String vendedor = Dvendedor.getText().toString();
-        String cliente = Dcliente.getText().toString();
-        String cantidad = Dcantidad.getText().toString();
-        String tipo = Dtipo.getSelectedItem().toString();
-        String precio = Dprecio.getText().toString();
-        String pago = Dpago.getText().toString();
 
-        if (!vendedor.isEmpty() && !cliente.isEmpty() && !cantidad.isEmpty() && !pago.isEmpty() && !precio.isEmpty()) {
-            ContentValues guardar = new ContentValues();
-            guardar.put("Fecha", fechas);
-            guardar.put("Vendedor", vendedor);
-            guardar.put("Cliente", cliente);
-            guardar.put("Tipocacao", tipo);
-            guardar.put("CantidadCacao", cantidad);
-            guardar.put("PrecioAPagar", precio);
-            guardar.put("PagoDeCacao", pago); // ← Corregido
+        // Obtenemos los valores de los campos del formulario.
+        String vendedor = Dvendedor.getText().toString().trim();
+        String cliente = Dcliente.getText().toString().trim();
+        String cantidad = Dcantidad.getText().toString().trim();
+        String tipo = Dtipo.getSelectedItem().toString().trim();
+        String precio = Dprecio.getText().toString().trim();
+        String pago = Dpago.getText().toString().trim();
 
-            baseDatos.insert("inventario", null, guardar);
-            baseDatos.close();
+        // Verificamos que los campos obligatorios no estén vacíos.
+        if (!vendedor.isEmpty() && !cliente.isEmpty() && !cantidad.isEmpty() && !precio.isEmpty() && !pago.isEmpty()) {
 
-            Dvendedor.setText("");
-            Dcliente.setText("");
-            Dcantidad.setText("");
-            Dprecio.setText("");
-            Dpago.setText("");
-            Toast.makeText(getApplicationContext(),"Felicidades, se ha guardado exitosamente.",Toast.LENGTH_SHORT).show();
-            solucion.setText("Felicidades, se ha guardado exitosamente.");
+            // Verificamos si el cliente ya existe usando el método clienteExiste.
+            if (clienteExiste(baseDatos, cliente)) {
+                // Si el cliente existe, mostramos un mensaje de advertencia.
+                Toast.makeText(getApplicationContext(), "Este cliente ya existe. porfavor Cree otro", Toast.LENGTH_SHORT).show();
+                solucion.setText("Este cliente ya existe. porfavor Cree otro.");
+            } else {
+                // Si el cliente no existe, insertamos los datos en la base de datos.
+                ContentValues guardar = new ContentValues();
+                guardar.put("Fecha", fechas);
+                guardar.put("Vendedor", vendedor);
+                guardar.put("Cliente", cliente);
+                guardar.put("Tipocacao", tipo);
+                guardar.put("CantidadCacao", cantidad);
+                guardar.put("PrecioAPagar", precio);
+                guardar.put("PagoDeCacao", pago);
+
+                // Insertamos los datos en la tabla "inventario".
+                baseDatos.insert("inventario", null, guardar);
+
+                // Limpiamos los campos del formulario.
+                Dvendedor.setText("");
+                Dcliente.setText("");
+                Dcantidad.setText("");
+                Dprecio.setText("");
+                Dpago.setText("");
+
+                // Mostramos un mensaje indicando que la operación fue exitosa.
+                Toast.makeText(getApplicationContext(), "Felicidades, se ha guardado exitosamente.", Toast.LENGTH_SHORT).show();
+                solucion.setText("Felicidades, se ha guardado exitosamente.");
+            }
         } else {
-            Toast.makeText(getApplicationContext(),"Campos vacíos. Por favor, intenta llenar los campos",Toast.LENGTH_SHORT).show();
+            // Si algún campo está vacío, mostramos un mensaje indicando que se deben llenar los campos.
+            Toast.makeText(getApplicationContext(), "Campos vacíos. Por favor, intenta llenar los campos.", Toast.LENGTH_SHORT).show();
             solucion.setText("Campos vacíos. Por favor, intenta llenar los campos.");
         }
 
+        // Cerramos la base de datos.
+        baseDatos.close();
     }
     public void Calcular(View view){
         if (Dvendedor.getText().toString().trim().isEmpty() ||
@@ -135,7 +159,7 @@ private  String fechas;
                 if (tipo.equalsIgnoreCase("SECO")) {
                     Dtipo.setSelection(1); // Si el tipo es SECO, selecciona la posición 1
                 } else {
-                    Dtipo.setSelection(0); // Si no es SECO (por ejemplo HUMEDO), selecciona la posición 0
+                    Dtipo.setSelection(0); // Si no es SECO, selecciona la posición 0
                 }
 
                 // Coloca los otros datos en los campos correspondientes
@@ -160,63 +184,60 @@ private  String fechas;
     }
     //Funcion para modificar datos
     public void modificarTabla(View view) {
-        // Creamos una instancia del helper para interactuar con la base de datos SQLite
+        // Creamos una instancia del administrador de la base de datos.
         AdminSQLiteOpenHelper motorDato = new AdminSQLiteOpenHelper(this, "Motor de Base de Datos", null, 1);
 
-        // Obtenemos acceso de escritura a la base de datos
+        // Abrimos la base de datos en modo escritura.
         SQLiteDatabase baseDatos = motorDato.getWritableDatabase();
 
-        // Extraemos los datos ingresados por el usuario desde los componentes de la interfaz
-        String vendedor = Dvendedor.getText().toString().trim();         // Campo de texto para el vendedor
-        String cliente = Dcliente.getText().toString().trim();           // Campo de texto para el cliente
-        String cantidad = Dcantidad.getText().toString().trim();         // Campo de texto para la cantidad de cacao
-        String tipo = Dtipo.getSelectedItem().toString().trim();         // Elemento seleccionado del Spinner para tipo de cacao
-        String precio = Dprecio.getText().toString().trim();             // Campo de texto para el precio a pagar
-        String pago = Dpago.getText().toString().trim();                 // Campo de texto para el pago recibido
+        // Obtenemos los valores del formulario.
+        String vendedor = Dvendedor.getText().toString().trim();
+        String cliente = Dcliente.getText().toString().trim();
+        String cantidad = Dcantidad.getText().toString().trim();
+        String tipo = Dtipo.getSelectedItem().toString().trim();
+        String precio = Dprecio.getText().toString().trim();
+        String pago = Dpago.getText().toString().trim();
 
-        // Verificamos que ninguno de los campos esté vacío
+        // Verificamos que los campos obligatorios no estén vacíos.
         if (!vendedor.isEmpty() && !cliente.isEmpty() && !cantidad.isEmpty() &&
                 !tipo.isEmpty() && !precio.isEmpty() && !pago.isEmpty()) {
 
-            // Creamos un objeto ContentValues para almacenar los datos que serán actualizados
-            ContentValues datosActualizados = new ContentValues();
-            datosActualizados.put("Vendedor", vendedor);                  // Asignamos nuevo valor para el campo "Vendedor"
-            datosActualizados.put("Tipocacao", tipo);                     // Asignamos nuevo valor para el campo "Tipocacao"
-            datosActualizados.put("CantidadCacao", cantidad);            // Asignamos nuevo valor para el campo "CantidadCacao"
-            datosActualizados.put("PrecioAPagar", precio);               // Asignamos nuevo valor para el campo "PrecioAPagar"
-            datosActualizados.put("PagoDeCacao", pago);                  // Asignamos nuevo valor para el campo "PagoDeCacao"
-
-            // Realizamos la operación de actualización en la tabla 'inventario'
-            // Usamos WHERE con parámetros seguros (evita inyecciones SQL y errores por texto malformado)
-            int filasModificadas = baseDatos.update(
-                    "inventario",                     // Nombre de la tabla
-                    datosActualizados,                // Datos nuevos que se actualizarán
-                    "Cliente = ?",                    // Condición WHERE para seleccionar la fila (por Cliente)
-                    new String[]{ cliente }           // Argumento que reemplaza el "?" en el WHERE
-            );
-
-            // Cerramos la base de datos para liberar recursos del sistema
-            baseDatos.close();
-
-            // Verificamos si se modificó exactamente una fila
-            if (filasModificadas == 1) {
-                // Si todo salió bien, mostramos mensaje de éxito al usuario
-                String mensaje = "Felicidades " + cliente + ", ha sido modificado correctamente.";
-                Toast.makeText(Formulario.this, mensaje, Toast.LENGTH_SHORT).show(); // Mostrar mensaje en pantalla
-                solucion.setText(mensaje); // Mostrar mensaje en un TextView en la interfaz
+            // Verificamos si el cliente existe usando el método clienteExiste.
+            if (!clienteExiste(baseDatos, cliente)) {
+                // Si el cliente no existe, mostramos un mensaje de advertencia.
+                Toast.makeText(this, "No se puede modificar. El cliente no existe.", Toast.LENGTH_SHORT).show();
+                solucion.setText("No se puede modificar. El cliente no existe.");
             } else {
-                // Si no se modificó ninguna fila, puede que el cliente no exista
-                String mensaje = "No se pudo modificar. Verifica si el cliente existe o si los datos están correctos.";
-                Toast.makeText(Formulario.this, mensaje, Toast.LENGTH_SHORT).show(); // Mostrar error al usuario
-                solucion.setText(mensaje); // Mostrar error en el TextView
-            }
+                // Si el cliente existe, actualizamos los datos en la base de datos.
+                ContentValues datosActualizados = new ContentValues();
+                datosActualizados.put("Vendedor", vendedor);
+                datosActualizados.put("Tipocacao", tipo);
+                datosActualizados.put("CantidadCacao", cantidad);
+                datosActualizados.put("PrecioAPagar", precio);
+                datosActualizados.put("PagoDeCacao", pago);
 
+                // Realizamos la actualización de los datos en la base de datos.
+                int filas = baseDatos.update("inventario", datosActualizados, "Cliente = ?", new String[]{cliente});
+
+                // Verificamos si la actualización fue exitosa.
+                if (filas == 1) {
+                    // Si la actualización fue exitosa, mostramos un mensaje de éxito.
+                    Toast.makeText(this, "Felicidades, ha sido modificado correctamente.", Toast.LENGTH_SHORT).show();
+                    solucion.setText("Felicidades, ha sido modificado correctamente.");
+                } else {
+                    // Si la actualización falló, mostramos un mensaje de error.
+                    Toast.makeText(this, "No se pudo modificar correctamente.", Toast.LENGTH_SHORT).show();
+                    solucion.setText("No se pudo modificar correctamente.");
+                }
+            }
         } else {
-            // Si uno o más campos están vacíos, avisamos al usuario
-            String mensaje = "Campos vacíos. Por favor, completa todos los datos.";
-            Toast.makeText(Formulario.this, mensaje, Toast.LENGTH_SHORT).show(); // Mostrar advertencia
-            solucion.setText(mensaje); // Mostrar advertencia en el TextView
+            // Si algún campo está vacío, mostramos un mensaje indicando que se deben llenar los campos.
+            Toast.makeText(this, "Campos vacíos. Por favor, completa todos los datos.", Toast.LENGTH_SHORT).show();
+            solucion.setText("Campos vacíos. Por favor, completa todos los datos.");
         }
+
+        // Cerramos la base de datos.
+        baseDatos.close();
     }
     public void eliminarTabla(View view){
         mostrarDialogoConfirmacion();
@@ -230,61 +251,138 @@ private  String fechas;
         Intent calculadora = new Intent(this,MainActivity.class);
         startActivity(calculadora);
     }
-    public void CalculoCacao(){
-        String cantida= Dcantidad.getText().toString();
-        String tprecio= Dprecio.getText().toString();
-        double cantidadCacao= Double.parseDouble(cantida);
-        double precioCacao= Double.parseDouble(tprecio);
-        cantidadCacaoBruto= cantidadCacao;
-        precioBruto= precioCacao;
+    // Método para realizar el cálculo del cacao
+    public void CalculoCacao() {
+        // Obtener el texto ingresado en los campos de cantidad y precio
+        // Dcantidad y Dprecio son EditText donde el usuario introduce la cantidad y el precio del cacao.
+        String cantida = Dcantidad.getText().toString();
+        String tprecio = Dprecio.getText().toString();
+
+        // Convertir el texto obtenido a tipo double para realizar cálculos
+        // Se usa Double.parseDouble para convertir los valores a números decimales.
+        double cantidadCacao = Double.parseDouble(cantida);
+        double precioCacao = Double.parseDouble(tprecio);
+
+        // Guardar las cantidades de cacao y precio para uso posterior
+        cantidadCacaoBruto = cantidadCacao;
+        precioBruto = precioCacao;
+
+        // Realizar un ajuste en la cantidad de cacao multiplicándola por un porcentaje
+        // Se usa Math.floor para redondear hacia abajo el valor calculado.
         cantidadCacao = Math.floor(cantidadCacaoBruto * porcentajeQuintal);
+
+        // Ajustar el precio del cacao según un porcentaje
         precioCacao = precioBruto / porCentajePrecio;
+
+        // Calcular el total del cacao multiplicando la cantidad ajustada por el precio ajustado
         double resultadoCacao = cantidadCacao * precioCacao;
+
+        // Formatear el resultado para mostrarlo con separadores de miles y dos decimales
+        // DecimalFormat se utiliza para formatear el número de forma legible, en este caso como dinero.
         DecimalFormat formato = new DecimalFormat("#,###.00");
+
+        // Convertir el resultado a una cadena formateada
         String resultado = formato.format(resultadoCacao);
-        solucion.setText(resultado+"$");
+
+        // Mostrar el resultado en un TextView (suponiendo que 'solucion' es un TextView)
+        // Se concatena el signo "$" al resultado para indicar que es un valor monetario.
+        solucion.setText(resultado + "$");
     }
+
+    // Método para que los botones no se proboque salidas abructas en el programa poniendo un mensaje en su lugar.
     public void InabilitarBotones(){
         Toast.makeText(getApplicationContext(),"Boton no Programado. Funcionara cuando el Desarrolador lo Termine",Toast.LENGTH_SHORT).show();
     }
+    // Método que obtiene la fecha y hora actual en un formato específico.
     public String obtenerFechaActual() {
+        // Creamos una instancia de SimpleDateFormat para definir el formato de la fecha y hora.
+        // El formato "yyyy-MM-dd HH:mm:ss" muestra la fecha como Año-Mes-Día Hora:Minuto:Segundo.
+        // Locale.getDefault() obtiene la configuración regional predeterminada del dispositivo,
+        // lo que asegura que el formato de la fecha sea adecuado para el idioma/región del usuario.
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+
+        // Creamos una instancia de Date, que representa la fecha y hora actuales.
         Date fecha = new Date();
+
+        // Usamos el método format() del objeto SimpleDateFormat para convertir la fecha en una cadena con el formato especificado.
         return formato.format(fecha);
     }
+    // Método que elimina los datos de la tabla "inventario" de la base de datos y reinicia el contador de IDs.
     public void eliminarDatosDeTabla(){
-        AdminSQLiteOpenHelper motorDato = new AdminSQLiteOpenHelper(this, "Motor de Base de Datos", null,1);
-        SQLiteDatabase baseDatos= motorDato.getWritableDatabase();
+        // Creamos una instancia de AdminSQLiteOpenHelper para poder acceder a la base de datos.
+        AdminSQLiteOpenHelper motorDato = new AdminSQLiteOpenHelper(this, "Motor de Base de Datos", null, 1);
+
+        // Abrimos la base de datos en modo escritura.
+        SQLiteDatabase baseDatos = motorDato.getWritableDatabase();
+
+        // Ejecutamos una operación de eliminación sobre la tabla "inventario". En este caso, no se especifican condiciones
+        // (es decir, se eliminarán todos los registros de la tabla).
         int filasAfectadas = baseDatos.delete("inventario", null, null);
 
-        // Reinicia el contador del ID autoincremental
+        // Reiniciamos el contador del ID autoincremental de la tabla "inventario", lo cual borra la secuencia de IDs.
+        // Esto es importante si queremos que los próximos registros empiecen con el ID 1 nuevamente.
         baseDatos.execSQL("DELETE FROM sqlite_sequence WHERE name='inventario'");
-        baseDatos.close();// Cierra la base de datos
 
+        // Cerramos la base de datos para liberar los recursos.
+        baseDatos.close();
+
+        // Verificamos si la operación de eliminación afectó filas, es decir, si se eliminaron registros.
         if (filasAfectadas > 0) {
+            // Si se eliminaron filas, mostramos un mensaje de éxito al usuario con un Toast.
             Toast.makeText(Formulario.this, "Felicidades El cacao fue despachado", Toast.LENGTH_SHORT).show();
+            // También actualizamos un componente en la interfaz (presumiblemente un TextView) con el mensaje de éxito.
             solucion.setText("Felicidades El cacao fue despachado");
         } else {
+            // Si no se eliminaron filas, significa que la tabla estaba vacía. Mostramos un mensaje de error.
             Toast.makeText(Formulario.this, "No hay caco a Despachar, porfavor intente llenar el formulario", Toast.LENGTH_SHORT).show();
+            // Actualizamos el componente de la interfaz con un mensaje indicando que no hay cacao para despachar.
             solucion.setText("No hay caco a Despachar, porfavor intente llenar el formulario");
         }
     }
+    // Método que muestra un cuadro de diálogo de confirmación antes de despachar el cacao.
     private void mostrarDialogoConfirmacion() {
+        // Creamos un objeto AlertDialog.Builder para construir el cuadro de diálogo.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Establecemos el título del cuadro de diálogo.
         builder.setTitle("Confirmar de Despache de cacao");
+
+        // Establecemos el mensaje que aparecerá en el cuadro de diálogo.
         builder.setMessage("¿Estás seguro de que deseas despachar el cacao?");
 
+        // Configuramos el botón positivo del cuadro de diálogo, que se activa si el usuario presiona "Sí".
+        // En este caso, si el usuario acepta, se llamará al método eliminarDatosDeTabla().
         builder.setPositiveButton("Sí", (dialog, which) -> eliminarDatosDeTabla());
 
+        // Configuramos el botón negativo del cuadro de diálogo, que se activa si el usuario presiona "No".
+        // Si el usuario decide no despachar el cacao, se muestra un Toast indicando que no se pudo despachar el cacao,
+        // y luego se cierra el cuadro de diálogo.
         builder.setNegativeButton("No", (dialog, which) -> {
+            // Mostramos un mensaje de Toast con la información correspondiente.
             Toast.makeText(Formulario.this, "No se pudo despachar el cacao, intentelo en otro momento", Toast.LENGTH_SHORT).show();
+            // Cerramos el cuadro de diálogo.
             dialog.dismiss();
         });
 
+        // Finalmente, mostramos el cuadro de diálogo al usuario.
         builder.show();
     }
+    // Método para verificar si un cliente ya existe en la base de datos.
+    private boolean clienteExiste(SQLiteDatabase db, String cliente) {
+        // Realizamos una consulta SQL para verificar si hay alguna fila con el cliente especificado.
+        Cursor cursor = db.rawQuery("SELECT 1 FROM inventario WHERE Cliente = ?", new String[]{cliente});
 
-        // TODO: creacion de sistema de facturacion usando un itent nuevo Realizar Domingo.
+        // Si el cursor se puede mover al primer resultado, entonces el cliente existe.
+        boolean existe = cursor.moveToFirst();
+
+        // Cerramos el cursor para liberar los recursos.
+        cursor.close();
+
+        // Devolvemos el resultado: true si existe, false si no.
+        return existe;
+    }
+
+        // TODO: diseño de sistema de facturacion usando un itent nuevo Realizar Domingo.
         // TODO: creacion un cajas de texto donde se vera o modificara los datos de la factura Realizar el Martes.
         // TODO: creacion crear botones que permitan buscar, borrar, exportar a pdf, imprimir, compartir Realizar el Martes.
         // TODO: Modificar la fecha con el horario de republica Dominicana Realizar el Miercoles.
