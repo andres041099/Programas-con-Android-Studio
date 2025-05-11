@@ -82,6 +82,6 @@ public  double porCentajePrecio= 50;
         Intent Inventario = new Intent(this,Inventario.class);
         startActivity(Inventario);
     }
-    //TODO: crear spiner para determinar si es un saco o un cubo y hacer que reste uno o 2
+    //TODO: crear spiner para determinar si es un saco o un cubo y hacer que reste uno o 2 Realizar el Domingo
     //TODO: Diseñar de manera apropiada las interfaces Realizar el .
 }
