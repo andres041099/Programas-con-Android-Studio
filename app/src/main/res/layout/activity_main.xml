@@ -42,6 +42,12 @@
             android:hint="TARA O QUINTLES"
             android:inputType="number" />
 
+        <Spinner
+            android:id="@+id/Envase"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
+
         <EditText
             android:id="@+id/txtCantidad"
             android:layout_width="match_parent"
@@ -63,6 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="RESULTADO"
+            android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold" />
 
