@@ -43,7 +43,6 @@ public  double porCentajePrecio= 50;
         casillaPrecio=(EditText)findViewById(R.id.txtPrecio);
         resultado=(TextView)findViewById(R.id.Resultado);
         envase=(Spinner) findViewById(R.id.Envase);
-        //crear spiner para determinar si es un saco o un cubo y hacer que reste uno o 2 Realizar el Domingo
         String [] envases = {"SACO","CUBO"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_items_tipo_envase, envases);
         envase.setAdapter(adapter);
@@ -58,6 +57,7 @@ public  double porCentajePrecio= 50;
         double precioCacao = Double.parseDouble(precio);
         cantidadCacaoBruto = cantidadCacao;
         precioBruto = precioCacao;
+        //Condicion que  determinar si es un saco que reste uno.
         if (seleccion.equals("SACO")) {
             double quintalPromedio = porCentajePrecio / QuintalesCacao;
             String redondeado = String.format("%.2f", quintalPromedio);
@@ -71,6 +71,7 @@ public  double porCentajePrecio= 50;
             DecimalFormat formato = new DecimalFormat("#,###.00");
             String resultante = formato.format(resultadoCacao);
             resultado.setText(resultante + "$");
+            //Condicion que  determinar si es un cubo que reste 2.
         } else if (seleccion.equals("CUBO")) {
             double quintalPromedio = porCentajePrecio / QuintalesCacao;
             String redondeado = String.format("%.2f", quintalPromedio);
@@ -84,9 +85,9 @@ public  double porCentajePrecio= 50;
             DecimalFormat formato = new DecimalFormat("#,###.00");
             String resultante = formato.format(resultadoCacao);
             resultado.setText(resultante + "$");
+        }else {
+            Toast.makeText(getApplicationContext(),"No se puede calcular esta cifra intetalo en otra ocacion",Toast.LENGTH_SHORT).show();
         }
-
-
     }
     public void Calcular(View view){
         if (casillaQuintales.getText().toString().trim().isEmpty() ||
