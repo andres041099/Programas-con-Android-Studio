@@ -4,7 +4,9 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
 private EditText casillaQuintales,casillaCantidad, casillaPrecio;
 private TextView resultado;
+Spinner envase;
 public  double cantidadCacaoBruto;
 public  double precioBruto;
 public  double porCentajePrecio= 50;
@@ -39,30 +42,50 @@ public  double porCentajePrecio= 50;
         casillaCantidad=(EditText)findViewById(R.id.txtCantidad);
         casillaPrecio=(EditText)findViewById(R.id.txtPrecio);
         resultado=(TextView)findViewById(R.id.Resultado);
+        envase=(Spinner) findViewById(R.id.Envase);
+        //crear spiner para determinar si es un saco o un cubo y hacer que reste uno o 2 Realizar el Domingo
+        String [] envases = {"SACO","CUBO"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_items_tipo_envase, envases);
+        envase.setAdapter(adapter);
     }
     public void CalculoCacao(){
         String porcentajeQuintal = casillaQuintales.getText().toString();
         String cantida = casillaCantidad.getText().toString();
         String precio = casillaPrecio.getText().toString();
+        String seleccion = envase.getSelectedItem().toString();
         double cantidadCacao = Double.parseDouble(cantida);
         double QuintalesCacao = Double.parseDouble(porcentajeQuintal);
         double precioCacao = Double.parseDouble(precio);
         cantidadCacaoBruto = cantidadCacao;
         precioBruto = precioCacao;
+        if (seleccion.equals("SACO")) {
+            double quintalPromedio = porCentajePrecio / QuintalesCacao;
+            String redondeado = String.format("%.2f", quintalPromedio);
+            double quintal = Double.parseDouble(redondeado);
+           double cantidaReducidaSaco= cantidadCacaoBruto-1;
+            cantidadCacao = Math.floor(cantidaReducidaSaco * quintal);
+            precioCacao = precioBruto / porCentajePrecio;
+            double resultadoCacao = cantidadCacao * precioCacao;
 
-        double quintalPromedio = porCentajePrecio / QuintalesCacao;
-        String redondeado = String.format("%.2f", quintalPromedio);
-        double quintal = Double.parseDouble(redondeado);
+            // Usamos DecimalFormat para agregar el separador de miles
+            DecimalFormat formato = new DecimalFormat("#,###.00");
+            String resultante = formato.format(resultadoCacao);
+            resultado.setText(resultante + "$");
+        } else if (seleccion.equals("CUBO")) {
+            double quintalPromedio = porCentajePrecio / QuintalesCacao;
+            String redondeado = String.format("%.2f", quintalPromedio);
+            double quintal = Double.parseDouble(redondeado);
+            double cantidaReducidaSaco= cantidadCacaoBruto-2;
+            cantidadCacao = Math.floor(cantidaReducidaSaco * quintal);
+            precioCacao = precioBruto / porCentajePrecio;
+            double resultadoCacao = cantidadCacao * precioCacao;
 
-        cantidadCacao = Math.floor(cantidadCacaoBruto * quintal);
-        precioCacao = precioBruto / porCentajePrecio;
+            // Usamos DecimalFormat para agregar el separador de miles
+            DecimalFormat formato = new DecimalFormat("#,###.00");
+            String resultante = formato.format(resultadoCacao);
+            resultado.setText(resultante + "$");
+        }
 
-        double resultadoCacao = cantidadCacao * precioCacao;
-
-// Usamos DecimalFormat para agregar el separador de miles
-        DecimalFormat formato = new DecimalFormat("#,###.00");
-        String resultante = formato.format(resultadoCacao);
-        resultado.setText(resultante + "$");
 
     }
     public void Calcular(View view){
@@ -82,6 +105,5 @@ public  double porCentajePrecio= 50;
         Intent Inventario = new Intent(this,Inventario.class);
         startActivity(Inventario);
     }
-    //TODO: crear spiner para determinar si es un saco o un cubo y hacer que reste uno o 2 Realizar el Domingo
     //TODO: Diseñar de manera apropiada las interfaces Realizar el .
 }
