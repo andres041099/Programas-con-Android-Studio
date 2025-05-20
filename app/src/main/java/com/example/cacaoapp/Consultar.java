@@ -9,14 +9,16 @@ import android.widget.TextView;
 
 public class Consultar {
 
+    // Método para obtener y mostrar todos los datos en un TableLayout
     public static void obtenerDatos(Context context, TableLayout tablas) {
         AdminSQLiteOpenHelper motorDato = new AdminSQLiteOpenHelper(context, "Motor de Base de Datos", null, 1);
         SQLiteDatabase baseDatos = motorDato.getReadableDatabase();
 
+        // Consulta todos los registros de la tabla "inventario"
         Cursor fila = baseDatos.rawQuery("SELECT * FROM inventario", null);
 
         if (fila.getCount() > 0) {
-            // Agrega encabezado
+            // Crear fila de encabezados
             TableRow filaEncabezado = new TableRow(context);
             for (int i = 0; i < fila.getColumnCount(); i++) {
                 TextView encabezado = new TextView(context);
@@ -27,95 +29,123 @@ public class Consultar {
             }
             tablas.addView(filaEncabezado);
 
-            // Agrega filas de datos
+            // Formateador para mostrar números con comas y dos decimales
+            java.text.DecimalFormat formato = new java.text.DecimalFormat("#,###.00");
+
+            // Iterar sobre cada fila del cursor
             if (fila.moveToFirst()) {
                 do {
                     TableRow filaDatos = new TableRow(context);
                     for (int i = 0; i < fila.getColumnCount(); i++) {
                         TextView celda = new TextView(context);
-                        celda.setText(fila.getString(i));
                         celda.setPadding(16, 16, 16, 16);
                         celda.setWidth(200);
+
+                        String columnaNombre = fila.getColumnName(i);
+                        String valor = fila.getString(i);
+
+                        // Formatear solo columnas numéricas
+                        if ((columnaNombre.equalsIgnoreCase("CantidadCacao") ||
+                                columnaNombre.equalsIgnoreCase("PagoDeCacao") ||
+                                columnaNombre.equalsIgnoreCase("PrecioAPagar")) && valor != null) {
+                            try {
+                                // Eliminar comas previas y convertir a número
+                                double numero = Double.parseDouble(valor.replace(",", ""));
+                                // Formatear con comas y decimales
+                                celda.setText(formato.format(numero));
+                            } catch (NumberFormatException e) {
+                                celda.setText(valor); // Mostrar original si hay error
+                            }
+                        } else {
+                            // Mostrar texto normal para columnas no numéricas
+                            celda.setText(valor);
+                        }
+
                         filaDatos.addView(celda);
                     }
                     tablas.addView(filaDatos);
                 } while (fila.moveToNext());
             }
 
-            // Muestra la sumatoria después de los datos
+            // Mostrar totales de Cantidad y Pago al final
             mostrarTotalCantidad(context, tablas, baseDatos);
         } else {
-            // Si no hay datos
+            // Si no hay datos en la base, mostrar mensaje
             TextView mensaje = new TextView(context);
             mensaje.setText("No hay datos en el inventario.");
             mensaje.setPadding(16, 16, 16, 16);
             tablas.addView(mensaje);
         }
 
+        // Cerrar cursor y base de datos
         fila.close();
         baseDatos.close();
     }
 
-    // Función para mostrar la suma de la columna cantidad
+    // Método para calcular y mostrar totales de CantidadCacao y PagoDeCacao
     public static void mostrarTotalCantidad(Context context, TableLayout tablas, SQLiteDatabase baseDatos) {
-        // Ejecuta una consulta SQL para obtener todos los datos de la tabla "inventario"
         Cursor cursor = baseDatos.rawQuery("SELECT * FROM inventario", null);
-        // Verifica que haya datos en el cursor y que se pueda mover al primer registro
+
         if (cursor.getCount() > 0 && cursor.moveToFirst()) {
-            // Obtiene los índices de las columnas "cantidad" y "pago"
+            // Obtener índices de columnas relevantes
             int indexCantidad = cursor.getColumnIndex("CantidadCacao");
             int indexPago = cursor.getColumnIndex("PagoDeCacao");
-// Variables para almacenar los totales
+
             double totalCantidad = 0;
             double totalPago = 0;
-            // Recorre cada fila del cursor para sumar los valores de las columnas
+
+            // Sumar cantidades y pagos
             do {
                 try {
-                    // Suma los valores de la columna "cantidad"
                     if (indexCantidad != -1) {
-                        totalCantidad += Double.parseDouble(cursor.getString(indexCantidad));
+                        String cantidadStr = cursor.getString(indexCantidad);
+                        if (cantidadStr != null) {
+                            cantidadStr = cantidadStr.replace(",", "");
+                            totalCantidad += Double.parseDouble(cantidadStr);
+                        }
                     }
-                    // Suma los valores de la columna "pago"
+
                     if (indexPago != -1) {
-                        totalPago += Double.parseDouble(cursor.getString(indexPago));
+                        String pagoStr = cursor.getString(indexPago);
+                        if (pagoStr != null) {
+                            pagoStr = pagoStr.replace(",", "");
+                            totalPago += Double.parseDouble(pagoStr);
+                        }
                     }
                 } catch (NumberFormatException e) {
-                    // En caso de que algún valor no sea numérico, lo ignora
+                    // Ignorar errores de conversión
                 }
             } while (cursor.moveToNext());
 
-            // Crea una nueva fila para mostrar los totales
+            // Crear fila para mostrar totales
             TableRow filaTotal = new TableRow(context);
-// Determina cuántas columnas tiene la tabla
             int totalColumnas = cursor.getColumnCount();
-            // Recorre todas las columnas para construir la fila total
+
+            // Formateador con comas y dos decimales
+            java.text.DecimalFormat formato = new java.text.DecimalFormat("#,###.00");
+
             for (int i = 0; i < totalColumnas; i++) {
                 TextView celda = new TextView(context);
-                celda.setPadding(16, 16, 16, 16); // Espaciado interior
+                celda.setPadding(16, 16, 16, 16);
 
                 if (i == 0) {
-                    // La primera celda muestra el texto "TOTAL"
                     celda.setText("TOTAL");
-                    celda.setTypeface(null, android.graphics.Typeface.BOLD);// Texto en negrita
+                    celda.setTypeface(null, android.graphics.Typeface.BOLD);
                 } else if (i == indexCantidad) {
-                    // En la columna de "cantidad", muestra el total correspondiente
-                    celda.setText(String.valueOf(totalCantidad));
+                    celda.setText(formato.format(totalCantidad));
                 } else if (i == indexPago) {
-                    // En la columna de "pago", muestra el total correspondiente
-                    celda.setText(String.valueOf(totalPago));
+                    celda.setText(formato.format(totalPago));
                 } else {
-                    // Las demás columnas se dejan vacías
-                    celda.setText(""); // dejar vacío en otras columnas
+                    celda.setText(""); // Vacío para las demás columnas
                 }
-                // Añade la celda a la fila de totales
+
                 filaTotal.addView(celda);
             }
-            // Finalmente, añade la fila de totales al TableLayout
+
+            // Agregar fila total al final de la tabla
             tablas.addView(filaTotal);
         }
-        // Cierra el cursor para liberar recursos
-        cursor.close();
-        //TODO:Usar mostrarTotalCantidad para el itent llamado Resultados o Estadistica de Inventario.
+
+        cursor.close(); // Cerrar cursor
     }
 }
-
