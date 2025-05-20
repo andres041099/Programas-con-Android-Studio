@@ -84,7 +84,6 @@ private  String fechas;
                 Toast.makeText(getApplicationContext(), "Este cliente ya existe. porfavor Cree otro", Toast.LENGTH_SHORT).show();
                 solucion.setText("Este cliente ya existe. porfavor Cree otro.");
             } else {
-                // Si el cliente no existe, insertamos los datos en la base de datos.
                 ContentValues guardar = new ContentValues();
                 guardar.put("Fecha", fechas);
                 guardar.put("Vendedor", vendedor);
@@ -299,7 +298,7 @@ private  String fechas;
         // El formato "yyyy-MM-dd HH:mm:ss" muestra la fecha como Año-Mes-Día Hora:Minuto:Segundo.
         // Locale.getDefault() obtiene la configuración regional predeterminada del dispositivo,
         // lo que asegura que el formato de la fecha sea adecuado para el idioma/región del usuario.
-        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat formato = new SimpleDateFormat("dd-MM-yyyy hh:mm a", Locale.getDefault());
 
         // Creamos una instancia de Date, que representa la fecha y hora actuales.
         Date fecha = new Date();
@@ -383,9 +382,7 @@ private  String fechas;
     }
 
         // TODO: diseño de sistema de facturacion usando un itent nuevo Realizar Domingo.
-        // TODO: creacion un cajas de texto donde se vera o modificara los datos de la factura Realizar el Martes.
-        // TODO: creacion crear botones que permitan buscar, borrar, exportar a pdf, imprimir, compartir Realizar el Martes.
-        // TODO: Modificar la fecha con el horario de republica Dominicana Realizar el Miercoles.
-        //TODO: Hacer que los datos introducidos se dividan por coma Realizar el Miercoles.
+        // TODO: creacion un cajas de texto donde se vera o modificara los datos de la factura.
+        // TODO: creacion crear botones que permitan buscar, borrar, exportar a pdf, imprimir, compartir.
        //TODO: Diseñar de manera apropiada las interfaces Realizar el .
 }
