@@ -102,9 +102,13 @@ public  double porCentajePrecio= 50;
         Intent formulario = new Intent(this,Formulario.class);
         startActivity(formulario);
     }
-    public void VerInventario(View view){
+    public void verInventario(View view){
         Intent Inventario = new Intent(this,Inventario.class);
         startActivity(Inventario);
+    }
+    public void verContador(View view){
+        Intent contador = new Intent(this,Contable.class);
+        startActivity(contador);
     }
     //TODO: Diseñar de manera apropiada las interfaces Realizar el .
 }
