@@ -250,6 +250,14 @@ private  String fechas;
         Intent calculadora = new Intent(this,MainActivity.class);
         startActivity(calculadora);
     }
+    public void verInventario(View view){
+        Intent inventario = new Intent(this,Inventario.class);
+        startActivity(inventario);
+    }
+    public void verFactura(View view){
+        Intent factura = new Intent(this, Facturacion.class);
+        startActivity(factura);
+    }
     // Método para realizar el cálculo del cacao
     public void CalculoCacao() {
         // Obtener el texto ingresado en los campos de cantidad y precio
@@ -286,11 +294,6 @@ private  String fechas;
         // Mostrar el resultado en un TextView (suponiendo que 'solucion' es un TextView)
         // Se concatena el signo "$" al resultado para indicar que es un valor monetario.
         solucion.setText(resultado + "$");
-    }
-
-    // Método para que los botones no se proboque salidas abructas en el programa poniendo un mensaje en su lugar.
-    public void InabilitarBotones(){
-        Toast.makeText(getApplicationContext(),"Boton no Programado. Funcionara cuando el Desarrolador lo Termine",Toast.LENGTH_SHORT).show();
     }
     // Método que obtiene la fecha y hora actual en un formato específico.
     public String obtenerFechaActual() {
@@ -380,9 +383,5 @@ private  String fechas;
         // Devolvemos el resultado: true si existe, false si no.
         return existe;
     }
-
-        // TODO: diseño de sistema de facturacion usando un itent nuevo Realizar Domingo.
-        // TODO: creacion un cajas de texto donde se vera o modificara los datos de la factura.
-        // TODO: creacion crear botones que permitan buscar, borrar, exportar a pdf, imprimir, compartir.
        //TODO: Diseñar de manera apropiada las interfaces Realizar el .
 }
