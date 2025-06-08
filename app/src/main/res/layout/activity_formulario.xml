@@ -67,6 +67,13 @@
             android:hint="PAGO"
             android:inputType="number" />
 
+        <TextView
+            android:id="@+id/txtresultados"
+            android:layout_width="374dp"
+            android:layout_height="wrap_content"
+            android:text="NO SE HA REALIZO ALGUNA ACCION"
+            android:textSize="14sp" />
+
         <Button
             android:id="@+id/btnGuardar"
             android:layout_width="match_parent"
@@ -106,7 +113,7 @@
             android:id="@+id/btnInventario"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="VerInventario"
+            android:onClick="verInventario"
             android:text="VER INVENTARIO" />
 
         <Button
@@ -114,14 +121,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="Calculadora"
-            android:text="CALULADORA CACAO" />
+            android:text="CALCULADORA CACAO" />
 
-        <TextView
-            android:id="@+id/txtresultados"
+        <Button
+            android:id="@+id/btnFacturar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="NO SE HA REALIZO ALGUNA ACCION"
-            android:textSize="24sp" />
+            android:onClick="verFactura"
+            android:text="FACTURAR" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
