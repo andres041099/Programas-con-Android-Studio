@@ -1,6 +1,7 @@
 package com.example.cacaoapp;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TableLayout;
 
 import androidx.activity.EdgeToEdge;
@@ -27,8 +28,9 @@ public class Inventario extends AppCompatActivity {
 
         // Llamar a la clase Consulta para obtener y mostrar los datos
         Consultar.obtenerDatos(this, tablas);
-        //TODO:Crear un boton para ver total de la fila en un itent llamado Resultados o Estadistica de Inventario
-        //TODO:Poner en una casilla la cantidad de cacao vendido, pago y el precio.
-        //TODO: Diseñar de manera apropiada las interfaces Realizar el.
+        //TODO: Diseñar de manera apropiada las interfaces.
+    }
+    public void PDF(View view){
+        ArchivoPortatil.inventarioPDF(this);
     }
 }
